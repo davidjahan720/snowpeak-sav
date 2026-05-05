@@ -79,14 +79,24 @@ Règles strictes :
 #   - chemin local (.ods, .xlsx, .csv) → lecture directe via pandas
 # ────────────────────────────────────────────────────────────────
 def sheet_url_to_csv(sheet_url: str, gid: str = "0") -> str | None:
-    """Convertit une URL de Google Sheet partagé en URL d'export CSV."""
+    """Convertit une URL de Google Sheet partagé en URL d'export CSV.
+
+    Extrait l'ID du sheet et auto-détecte le `gid` depuis l'URL si présent
+    dans le fragment `#gid=...` ou la query `?gid=...`. L'argument `gid`
+    sert de fallback uniquement.
+    """
     if not sheet_url:
         return None
     match = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", sheet_url)
     if not match:
         return None
     sheet_id = match.group(1)
-    return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+
+    # Auto-détection du gid dans l'URL (fragment `#gid=...` ou query `?gid=...`)
+    gid_match = re.search(r"[#&?]gid=(\d+)", sheet_url)
+    effective_gid = gid_match.group(1) if gid_match else (gid or "0")
+
+    return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={effective_gid}"
 
 
 def _looks_like_url(value: str) -> bool:
