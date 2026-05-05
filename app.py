@@ -20,10 +20,21 @@ from mistralai.client import Mistral
 # ────────────────────────────────────────────────────────────────
 load_dotenv()
 
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
-SHEET_URL_DEFAULT = os.getenv("SHEET_URL", "")
-SHEET_GID_DEFAULT = os.getenv("SHEET_GID", "0")
-MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-large-latest")
+
+def get_setting(key: str, default: str = "") -> str:
+    """Lit une valeur depuis st.secrets (Streamlit Cloud) puis os.getenv (local .env)."""
+    try:
+        if key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:  # noqa: BLE001
+        pass  # secrets.toml absent en local → on continue avec os.getenv
+    return os.getenv(key, default)
+
+
+MISTRAL_API_KEY = get_setting("MISTRAL_API_KEY", "")
+SHEET_URL_DEFAULT = get_setting("SHEET_URL", "")
+SHEET_GID_DEFAULT = get_setting("SHEET_GID", "0")
+MISTRAL_MODEL = get_setting("MISTRAL_MODEL", "mistral-large-latest")
 
 TOP_K_TICKETS = 5
 
