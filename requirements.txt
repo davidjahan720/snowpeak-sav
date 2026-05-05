@@ -1,0 +1,7 @@
+streamlit>=1.30
+mistralai>=1.0
+pandas>=2.0
+requests>=2.31
+python-dotenv>=1.0
+odfpy>=1.4
+openpyxl>=3.1
